@@ -155,10 +155,10 @@ public class JDBCMetricsFilter implements Filter {
 
   private void updateStatistics(ReadAndWrites rw) {
     JDBCMetrics metrics = JDBCMetrics.getInstance();
-    metrics.getReadCountsPerRequest().update(rw.getReads());
-    metrics.getWriteCountsPerRequest().update(rw.getWrites());
-    metrics.getReadTimerPerRequest().update(rw.getTotalReadTime(), TimeUnit.NANOSECONDS);
-    metrics.getWriteTimerPerRequest().update(rw.getTotalWriteTime(), TimeUnit.NANOSECONDS);
+    metrics.getReadCountsPerRequest().record(rw.getReads());
+    metrics.getWriteCountsPerRequest().record(rw.getWrites());
+    metrics.getReadTimerPerRequest().record(rw.getTotalReadTime(), TimeUnit.NANOSECONDS);
+    metrics.getWriteTimerPerRequest().record(rw.getTotalWriteTime(), TimeUnit.NANOSECONDS);
   }
 
   private void setHeaders(ReadAndWrites rw, HttpServletResponse response) {

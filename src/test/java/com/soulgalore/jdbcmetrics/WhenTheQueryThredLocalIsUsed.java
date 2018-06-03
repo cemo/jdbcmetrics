@@ -1,9 +1,9 @@
 package com.soulgalore.jdbcmetrics;
 
-import static org.junit.Assert.*;
 
 import org.junit.Test;
-import static org.hamcrest.Matchers.is;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WhenTheQueryThredLocalIsUsed {
 
@@ -12,7 +12,7 @@ public class WhenTheQueryThredLocalIsUsed {
     QueryThreadLocal.init();
     QueryThreadLocal.addRead(1223);
     try {
-      assertThat(QueryThreadLocal.getNrOfQueries().getReads(), is(1));
+      assertThat(QueryThreadLocal.getNrOfQueries().getReads()).isEqualTo(1);
     } finally {
       QueryThreadLocal.removeNrOfQueries();
     }
@@ -23,7 +23,7 @@ public class WhenTheQueryThredLocalIsUsed {
     QueryThreadLocal.init();
     QueryThreadLocal.addWrite(2322);
     try {
-      assertThat(QueryThreadLocal.getNrOfQueries().getWrites(), is(1));
+      assertThat(QueryThreadLocal.getNrOfQueries().getWrites()).isEqualTo(1);
     } finally {
       QueryThreadLocal.removeNrOfQueries();
     }

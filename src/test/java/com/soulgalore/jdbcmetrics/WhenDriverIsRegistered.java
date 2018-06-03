@@ -1,7 +1,5 @@
 package com.soulgalore.jdbcmetrics;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,6 +10,8 @@ import org.junit.Test;
 
 import com.soulgalore.jdbcmetrics.Driver;
 import com.soulgalore.jdbcmetrics.proxy.AbstractDriverTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WhenDriverIsRegistered extends AbstractDriverTest {
 
@@ -25,16 +25,15 @@ public class WhenDriverIsRegistered extends AbstractDriverTest {
         break;
       }
     }
-    assertThat("JDBCMetricsDriver should be registered in DriverManager", foundJDBCMetricsDriver);
-    assertThat(underlayingDriver, isIn(driversInManager));
+    assertThat(foundJDBCMetricsDriver).isTrue();
+    assertThat(underlayingDriver).isIn(driversInManager);
   }
 
   @Test
   public void driverShouldBeLocatedByKnownUrl() throws SQLException {
     java.sql.Driver d = DriverManager.getDriver(URL_JDBC_METRICS);
-    assertThat("JDBCMetricsDriver should be registered in DriverManager and understand url", d,
-        notNullValue());
-    assertThat(d, instanceOf(Driver.class));
+    assertThat(d).isNotNull();
+    assertThat(d).isInstanceOf(Driver.class);
   }
 
   @Test(expected = SQLException.class)
@@ -45,43 +44,38 @@ public class WhenDriverIsRegistered extends AbstractDriverTest {
 
   @Test
   public void knownUrlShouldBeCleaned() {
-    assertThat("The url should be cleaned from jdbcmetrics", driver.cleanUrl(URL_JDBC_METRICS),
-        equalTo(URL_KNOWN_DRIVER));
+    assertThat(driver.cleanUrl(URL_JDBC_METRICS)).isEqualTo(URL_KNOWN_DRIVER);
   }
 
   @Test
   public void knownUrlWithDriverShouldBeCleaned() {
-    assertThat("The url should be cleaned from jdbcmetrics",
-        driver.cleanUrl(URL_JDBC_METRICS_SPECIFIED_DRIVER), equalTo(URL_KNOWN_DRIVER));
+    assertThat(driver.cleanUrl(URL_JDBC_METRICS_SPECIFIED_DRIVER)).isEqualTo(URL_KNOWN_DRIVER);
   }
 
   @Test
   public void unknownUrlShouldNotBeCleaned() {
-    assertThat("The url should be intact", driver.cleanUrl(URL_UNKNOWN), equalTo(URL_UNKNOWN));
+    assertThat(driver.cleanUrl(URL_UNKNOWN)).isEqualTo(URL_UNKNOWN);
   }
 
   @Test
   public void underlayingDriverShouldExistInDriverManager() throws SQLException {
-    assertThat("Should be the underlaying driver",
-        driver.getDriverFromDriverManager(driver.cleanUrl(URL_KNOWN_DRIVER)),
-        sameInstance(underlayingDriver));
+    assertThat(driver.getDriverFromDriverManager(driver.cleanUrl(URL_KNOWN_DRIVER))).isSameAs(underlayingDriver);
   }
 
   @Test
   public void underlayingDriverShouldExist() throws SQLException {
-    assertThat("Should be the underlaying driver",
-        driver.getDriver(URL_JDBC_METRICS, URL_KNOWN_DRIVER), sameInstance(underlayingDriver));
+    assertThat(driver.getDriver(URL_JDBC_METRICS, URL_KNOWN_DRIVER)).isSameAs(underlayingDriver);
   }
 
   @Test
   public void specifiedDriverClassNameShouldBeParsedFromUrl() {
-    assertThat(driver.getSpecifiedDriverClassName(URL_JDBC_METRICS_SPECIFIED_DRIVER),
-        equalTo("org.postgresql.Driver"));
+    assertThat(driver.getSpecifiedDriverClassName(URL_JDBC_METRICS_SPECIFIED_DRIVER))
+        .isEqualTo("org.postgresql.Driver");
   }
 
   @Test
   public void specifiedDriverClassNameShouldNotBeFoundInUrl() {
-    assertThat(driver.getSpecifiedDriverClassName(URL_JDBC_METRICS), nullValue());
+    assertThat(driver.getSpecifiedDriverClassName(URL_JDBC_METRICS)).isNull();
   }
 
   @Test(expected = RuntimeException.class)
@@ -97,20 +91,20 @@ public class WhenDriverIsRegistered extends AbstractDriverTest {
   @Test
   public void driverByClassNameShouldReturn() {
     java.sql.Driver d = driver.getDriverByClassName(Driver.class.getName());
-    assertThat(d, notNullValue());
-    assertThat("Should be jdbcmetrics driver", d.getClass().equals(Driver.class));
+    assertThat(d).isNotNull();
+    assertThat(d.getClass()).isEqualTo(Driver.class);
   }
 
   @Test
   public void shouldAcceptUrl() throws SQLException {
-    assertThat(driver.acceptsURL(URL_JDBC_METRICS), is(true));
-    assertThat(driver.acceptsURL(URL_JDBC_METRICS_SPECIFIED_DRIVER), is(true));
+    assertThat(driver.acceptsURL(URL_JDBC_METRICS)).isTrue();
+    assertThat(driver.acceptsURL(URL_JDBC_METRICS_SPECIFIED_DRIVER)).isTrue();
   }
 
   @Test
   public void shouldNotAcceptUrl() throws SQLException {
-    assertThat(driver.acceptsURL(URL_KNOWN_DRIVER), is(false));
-    assertThat(driver.acceptsURL(URL_UNKNOWN), is(false));
+    assertThat(driver.acceptsURL(URL_KNOWN_DRIVER)).isFalse();
+    assertThat(driver.acceptsURL(URL_UNKNOWN)).isFalse();
   }
 
 }

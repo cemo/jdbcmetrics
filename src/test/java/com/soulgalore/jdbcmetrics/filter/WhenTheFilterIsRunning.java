@@ -1,8 +1,7 @@
 package com.soulgalore.jdbcmetrics.filter;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -37,8 +36,7 @@ public class WhenTheFilterIsRunning {
     try {
       try {
         filter.init(config);
-        assertThat("The header name should be the default one", filter.requestHeaderName,
-            is(JDBCMetricsFilter.DEFAULT_REQUEST_HEADER_NAME));
+        assertThat(filter.requestHeaderName).isEqualTo(JDBCMetricsFilter.DEFAULT_REQUEST_HEADER_NAME);
       } catch (ServletException e) {
         fail();
       }

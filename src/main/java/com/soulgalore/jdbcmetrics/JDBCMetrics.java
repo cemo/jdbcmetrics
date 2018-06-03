@@ -22,14 +22,13 @@
  */
 package com.soulgalore.jdbcmetrics;
 
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.SharedMetricRegistries;
-import com.codahale.metrics.Timer;
 
 /**
  * Class responsible for holding all the Yammer Metrics. The default MetricRegistry is used by
@@ -47,10 +46,10 @@ public class JDBCMetrics {
   private static final String TYPE_WRITE = "write";
   private static final String TYPE_READ_OR_WRITE = "readorwrite";
 
-  private final MetricRegistry registry;
+  private final MeterRegistry registry = Metrics.globalRegistry;
 
-  private final Histogram readCountsPerRequest;
-  private final Histogram writeCountsPerRequest;
+  private final DistributionSummary readCountsPerRequest;
+  private final DistributionSummary writeCountsPerRequest;
 
   private final Timer writeTimer;
   private final Timer readTimer;
@@ -84,27 +83,24 @@ public class JDBCMetrics {
       }
     }
 
-    if (propertyValue != null)
-      registry = SharedMetricRegistries.getOrCreate(propertyValue);
-    else
-      registry = new MetricRegistry();
+    //if (propertyValue != null)
+    //  registry = SharedMetricRegistries.getOrCreate(propertyValue);
+    //else
+    //  registry = new SimpleMeterRegistry();
 
-    readCountsPerRequest =
-        registry.histogram(createName(GROUP, TYPE_READ, "read-counts-per-request"));
+    readCountsPerRequest = registry.summary("read-counts-per-request", GROUP, TYPE_READ);
 
-    writeCountsPerRequest =
-        registry.histogram(createName(GROUP, TYPE_WRITE, "write-counts-per-request"));
+    writeCountsPerRequest = registry.summary("write-counts-per-request", GROUP, TYPE_WRITE);
 
-    writeTimer = registry.timer(createName(GROUP, TYPE_WRITE, "write-time"));
+    writeTimer = registry.timer("write-time", GROUP, TYPE_WRITE );
 
-    readTimer = registry.timer(createName(GROUP, TYPE_READ, "read-time"));
+    readTimer = registry.timer("read-time", GROUP, TYPE_READ);
 
-    writeTimerPerRequest = registry.timer(createName(GROUP, TYPE_WRITE, "write-time-per-request"));
+    writeTimerPerRequest = registry.timer("write-time-per-request", GROUP, TYPE_WRITE);
 
-    readTimerPerRequest = registry.timer(createName(GROUP, TYPE_READ, "read-time-per-request"));
+    readTimerPerRequest = registry.timer("read-time-per-request", GROUP, TYPE_READ);
 
-    connectionPoolTimer =
-        registry.timer(createName(GROUP_POOL, TYPE_READ_OR_WRITE, "wait-for-connection"));
+    connectionPoolTimer = registry.timer("wait-for-connection", GROUP_POOL, TYPE_READ_OR_WRITE);
   }
 
   /**
@@ -117,11 +113,11 @@ public class JDBCMetrics {
   }
 
 
-  public Histogram getReadCountsPerRequest() {
+  public DistributionSummary getReadCountsPerRequest() {
     return readCountsPerRequest;
   }
 
-  public Histogram getWriteCountsPerRequest() {
+  public DistributionSummary getWriteCountsPerRequest() {
     return writeCountsPerRequest;
   }
 
@@ -137,7 +133,7 @@ public class JDBCMetrics {
     return connectionPoolTimer;
   }
 
-  public MetricRegistry getRegistry() {
+  public MeterRegistry getRegistry() {
     return registry;
   }
 
@@ -147,9 +143,5 @@ public class JDBCMetrics {
 
   public Timer getReadTimerPerRequest() {
     return readTimerPerRequest;
-  }
-
-  private static String createName(String group, String type, String name) {
-    return MetricRegistry.name(group, type, name);
   }
 }

@@ -1,9 +1,8 @@
 package com.soulgalore.jdbcmetrics;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import javax.naming.RefAddr;
 import javax.naming.Reference;
@@ -18,7 +17,7 @@ public class WhenDataSourceIsCreatedByFactory {
   public void refStringShouldReturnNullWhenMissing() {
     Reference ref = mock(Reference.class);
     when(ref.get("test")).thenReturn(null);
-    assertThat(factory.getRefString(ref, "test"), nullValue());
+    assertThat(factory.getRefString(ref, "test")).isNull();
   }
 
   @Test
@@ -27,13 +26,13 @@ public class WhenDataSourceIsCreatedByFactory {
     RefAddr refAddr = mock(RefAddr.class);
     when(refAddr.getContent()).thenReturn("hello");
     when(ref.get("test")).thenReturn(refAddr);
-    assertThat(factory.getRefString(ref, "test"), is("hello"));
+    assertThat(factory.getRefString(ref, "test")).isEqualTo("hello");
   }
 
   @Test
   public void shouldCreateDataSourceByDefault() throws Exception {
     Reference ref = mock(Reference.class);
-    assertThat(factory.getObjectInstance(ref, null, null, null), instanceOf(DataSource.class));
+    assertThat(factory.getObjectInstance(ref, null, null, null)).isInstanceOf((DataSource.class));
   }
 
   @Test
@@ -42,8 +41,7 @@ public class WhenDataSourceIsCreatedByFactory {
     RefAddr refAddr = mock(RefAddr.class);
     when(refAddr.getContent()).thenReturn(ConnectionPoolDataSource.class.getName());
     when(ref.get(DataSourceFactory.CLASS_NAME)).thenReturn(refAddr);
-    assertThat(factory.getObjectInstance(ref, null, null, null),
-        instanceOf(ConnectionPoolDataSource.class));
+    assertThat(factory.getObjectInstance(ref, null, null, null)).isInstanceOf(ConnectionPoolDataSource.class);
   }
 
   @Test
@@ -52,7 +50,7 @@ public class WhenDataSourceIsCreatedByFactory {
     RefAddr refAddr = mock(RefAddr.class);
     when(refAddr.getContent()).thenReturn(XADataSource.class.getName());
     when(ref.get(DataSourceFactory.CLASS_NAME)).thenReturn(refAddr);
-    assertThat(factory.getObjectInstance(ref, null, null, null), instanceOf(XADataSource.class));
+    assertThat(factory.getObjectInstance(ref, null, null, null)).isInstanceOf((XADataSource.class));
   }
 
 }

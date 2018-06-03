@@ -1,12 +1,10 @@
 package com.soulgalore.jdbcmetrics;
 
-import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WhenAWriteIsDone {
 
@@ -22,14 +20,14 @@ public class WhenAWriteIsDone {
   public void theNumberOfWritesShouldBeIncreased() {
 
     rw.incWrites(5);
-    assertThat("The writes should be increased", rw.getWrites(), is(1));
+    assertThat(rw.getWrites()).isEqualTo(1);
+    assertThat(rw.getWrites()).isEqualTo(1);
     rw.incWrites(4);
     rw.incWrites(2);
-    assertThat("The writes should be increased", rw.getWrites(), is(3));
-    assertThat("The total write time is right", (new Long(rw.getTotalWriteTime())).intValue(),
-        is(11));
+    assertThat( rw.getWrites()).isEqualTo(3);
+    assertThat(rw.getTotalWriteTime()).isEqualTo(11);
     rw.clear();
-    assertThat("The writes should be cleared", rw.getWrites(), is(0));
+    assertThat(rw.getWrites()).isEqualTo(0);
 
   }
 
